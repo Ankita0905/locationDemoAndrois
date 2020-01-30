@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">locationDemoAndrois</string>
+    <string name="warning_txt">Permission is mandatory</string>
+    <string name="settings">Settings</string>
 </resources>

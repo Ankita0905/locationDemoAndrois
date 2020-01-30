@@ -7,12 +7,16 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
+import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -168,6 +172,18 @@ public class MainActivity extends AppCompatActivity {
         else
             {
             //permission is denied
+                showSnackBar(R.string.warning_txt, R.string.settings, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // create the intent
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", BuildConfig.APPLICATION_ID,null);
+                        intent.setData(uri);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                });
 
 
             }
@@ -214,6 +230,13 @@ public class MainActivity extends AppCompatActivity {
         {
             Log.i(tag,"requestPermission: " + "Displaying the permission rationale");
             //Provide the way so that the user can grant the permission
+
+            showSnackBar(R.string.warning_txt, android.R.string.ok, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startLocationPermissionRequest();
+                }
+            });
         }
         else
         {
