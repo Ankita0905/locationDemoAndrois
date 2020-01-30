@@ -23,6 +23,8 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     Button btn_Start, btn_Stop;
     TextView location_textView;
 
+    Location lastKnownLocation;
+
     /*
     the other way to access location od the user
     with the FusedLocationProvider
@@ -41,6 +45,23 @@ public class MainActivity extends AppCompatActivity {
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest locationRequest;
     LocationCallback locationCallback;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        //check permission
+        if(!checkPermission())
+        {
+            requestPermission();
+
+        }
+        else
+        {
+
+            getLastLocation();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,11 +160,15 @@ public class MainActivity extends AppCompatActivity {
         else if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
         {
             //permission is granted
-//            getLocation();
+
+            buildLocationRequest();
+            buildLocationCallback();
         }
         else
             {
             //permission is denied
+
+
             }
     }
 
@@ -164,11 +189,64 @@ public class MainActivity extends AppCompatActivity {
 
                 for (Location location: locationResult.getLocations())
                 {
-                    location_textView.setText(String.valueOf(location.getLatitude()) + "/" + String.valueOf(location.getLongitude()));
+                    setLocation(location);
                 }
             }
         };
 
+    }
+
+    private boolean checkPermission()
+    {
+        int permissionState = ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION);
+        return permissionState == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermission()
+    {
+        /*
+        we provide an additional rationale to the user when the user has denied the permission
+         */
+        boolean shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if(shouldProvideRationale)
+        {
+            Log.i(tag,"requestPermission: " + "Displaying the permission rationale");
+            //Provide the way so that the user can grant the permission
+        }
+        else
+        {
+            startLocationPermissionRequest();
+        }
+    }
+
+    private void startLocationPermissionRequest()
+    {
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+    }
+
+    private void getLastLocation()
+    {
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(this, new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                if(task.isSuccessful() && task.getResult() != null)
+                {
+                    lastKnownLocation = task.getResult();
+                    setLocation(lastKnownLocation);
+                }
+            }
+        });
+    }
+
+    private void setLocation(Location location)
+    {
+        location_textView.setText(String.valueOf(location.getLatitude()) + "/" + String.valueOf(location.getLongitude()));
+    }
+
+    private void showSnackBar(final int mainStringID, final int actionStringID, View.OnClickListener listener)
+    {
+        
     }
 
 
