@@ -25,6 +25,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -246,7 +247,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void showSnackBar(final int mainStringID, final int actionStringID, View.OnClickListener listener)
     {
-        
+
+        Snackbar.make(findViewById(android.R.id.content), getString(mainStringID), Snackbar.LENGTH_INDEFINITE).setAction(actionStringID, listener).show();
     }
 
 
